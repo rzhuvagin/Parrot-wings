@@ -4,6 +4,8 @@ import { RegistrationComponent } from './registration/registration.component';
 import { CommonModule } from '@angular/common';
 import { AuthRoutingModule } from './auth-routing.module';
 
+import { MatCardModule } from '@angular/material/card';
+
 @NgModule({
   declarations: [
     LoginComponent,
@@ -12,6 +14,7 @@ import { AuthRoutingModule } from './auth-routing.module';
   imports: [
     CommonModule,
     AuthRoutingModule,
+    MatCardModule,
   ],
   exports: [
   ]
