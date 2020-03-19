@@ -1,6 +1,6 @@
 <div class="card-wrapper">
   <mat-card class="registration">
-    <form [formGroup]="registrationForm">
+    <form [formGroup]="registrationForm" (ngSubmit)="submit()">
       <mat-card-title>Register new user</mat-card-title>
       <mat-card-subtitle>If you have an account, you can <a href="#">sign in</a></mat-card-subtitle>
 
@@ -10,7 +10,10 @@
           <mat-label>Enter your username</mat-label>
           <input matInput
             formControlName="username">
-          <mat-error *ngIf="registrationForm.get('username').errors.required">Username is required</mat-error>
+          <mat-error
+            *ngIf="!registrationForm.get('username').valid && registrationForm.get('username').errors.required">
+              Username is required
+            </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="fill">
@@ -34,6 +37,14 @@
               Email is not valid
             </mat-error>
         </mat-form-field>
+        <div>
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="!registrationForm.valid">
+            Register
+          </button>
+        </div>
 
       </div>
     </form>
