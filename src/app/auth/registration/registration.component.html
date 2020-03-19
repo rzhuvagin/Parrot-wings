@@ -1,6 +1,41 @@
-<mat-card class="registration">
-  <form>
-    <mat-card-title>Register new user</mat-card-title>
-    <mat-card-subtitle>If you have an account, you can <a href="#">sign in</a></mat-card-subtitle>
-  </form>
-</mat-card>
+<div class="card-wrapper">
+  <mat-card class="registration">
+    <form [formGroup]="registrationForm">
+      <mat-card-title>Register new user</mat-card-title>
+      <mat-card-subtitle>If you have an account, you can <a href="#">sign in</a></mat-card-subtitle>
+
+      <div class="example-container">
+
+        <mat-form-field appearance="fill">
+          <mat-label>Enter your username</mat-label>
+          <input matInput
+            formControlName="username">
+          <mat-error *ngIf="registrationForm.get('username').errors.required">Username is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Enter your password</mat-label>
+          <input matInput
+            type="password"
+            formControlName="password">
+          <!-- <mat-error *ngIf="email.invalid">{{getErrorMessage()}}</mat-error> -->
+        </mat-form-field>
+
+        <mat-form-field appearance="fill">
+          <mat-label>Enter your email</mat-label>
+          <input matInput
+            formControlName="email">
+            <mat-error
+              *ngIf="!registrationForm.get('email').valid && registrationForm.get('email').errors['required']">
+              Email is required
+            </mat-error>
+            <mat-error
+              *ngIf="!registrationForm.get('email').valid && registrationForm.get('email').errors['email']">
+              Email is not valid
+            </mat-error>
+        </mat-form-field>
+
+      </div>
+    </form>
+  </mat-card>
+</div>
