@@ -27,6 +27,7 @@
         <mat-form-field appearance="fill">
           <mat-label>Enter your email</mat-label>
           <input matInput
+            type="email"
             formControlName="email">
             <mat-error
               *ngIf="!registrationForm.get('email').valid && registrationForm.get('email').errors['required']">
