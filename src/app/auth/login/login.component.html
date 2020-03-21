@@ -1,1 +1,69 @@
-<h2>Login component</h2>
+<div class="card-wrapper">
+  <mat-card class="registration">
+    <form [formGroup]="loginForm" (ngSubmit)="submit()">
+      <mat-card-title>Logging in</mat-card-title>
+      <mat-card-subtitle>
+        If you haven't an account, you can <a routerLink="/registration">sign up</a>
+      </mat-card-subtitle>
+
+      <div *ngIf="errorMessage" class="registration__error">
+        <mat-divider></mat-divider>
+        <div class="registration__error-label">
+          {{ errorMessage }}
+        </div>
+        <mat-divider></mat-divider>
+      </div>
+      <div class="registration__fields-container">
+
+        <mat-form-field appearance="legacy">
+          <mat-label>Enter your email</mat-label>
+          <input matInput type="email" formControlName="email" />
+          <mat-error
+            *ngIf="
+              !loginForm.get('email').valid &&
+              loginForm.get('email').errors['required']
+            "
+          >
+            Email is required
+          </mat-error>
+          <mat-error
+            *ngIf="
+              !loginForm.get('email').valid &&
+              loginForm.get('email').errors['email']
+            "
+          >
+            Email is not valid
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="legacy">
+          <mat-label>Enter your password</mat-label>
+          <input
+            matInput
+            [type]="hidePassword ? 'password' : 'text'"
+            formControlName="password"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            (click)="hidePassword = !hidePassword"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword"
+          >
+            <mat-icon>{{ hidePassword ? "visibility_off" : "visibility" }}</mat-icon>
+          </button>
+        </mat-form-field>
+
+        <div class="registration__button-container">
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="!loginForm.valid"
+          >
+            Login
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-card>
+</div>

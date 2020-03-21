@@ -14,7 +14,7 @@ export class ApiService {
     private _snackBar: MatSnackBar
     ) { }
 
-  post<T>(
+  post$<T>(
     url: string,
     body: object,
     showResult: boolean = false
@@ -24,17 +24,17 @@ export class ApiService {
     if (token) {
       headers.append('authentication', `bearer ${token}`);
     }
-    const request = this._http.post<T>(
-      `${environment.apiBaseUrl}/${url}`,
+    const request$ = this._http.post<T>(
+      environment.apiBaseUrl + url,
       body,
       {
         headers,
       }
     )
     if (!showResult) {
-      return request;
+      return request$;
     }
-    return request.pipe(
+    return request$.pipe(
       tap(
         (res: any) => this._snackBar.open(
           'Success',

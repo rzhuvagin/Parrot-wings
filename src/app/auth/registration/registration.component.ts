@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-registration',
@@ -14,7 +15,8 @@ export class RegistrationComponent implements OnInit, OnDestroy{
   hidePassword = true;
 
   constructor(
-    private authService: AuthService
+    private _authService: AuthService,
+    private _router: Router,
   ) { }
 
   ngOnInit() {
@@ -25,7 +27,7 @@ export class RegistrationComponent implements OnInit, OnDestroy{
       ),
       password: new FormControl(
         null,
-        [Validators.required, Validators.pattern(/[0-9A-Z]/)]
+        [Validators.required, Validators.minLength(6), Validators.pattern(/[0-9A-z]/)]
       ),
       email: new FormControl(
         null,
@@ -42,9 +44,9 @@ export class RegistrationComponent implements OnInit, OnDestroy{
   submit() {
     this.errorMessage = '';
     const user = this.registrationForm.value;
-    this.authService.register(user).subscribe(
+    this._authService.register$(user).subscribe(
       response => {
-        localStorage.setItem('Authorization', 'Bearer ' + response['id_token']);
+        this._router.navigate(['/']);
       },
       (error: HttpErrorResponse) => {
         this.errorMessage = error.error;
