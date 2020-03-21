@@ -11,14 +11,8 @@ export class AuthService {
   private token: string;
 
   register(user: UserModel) {
-    // const request = this.http.post(
-    //   `http://193.124.114.46:3001` + `/users`,
-    //   user
-    // )
-    // return request;
-    this.apiService.post<any>('users', user).subscribe(
-      response => localStorage.setItem('Authorization', 'Bearer ' + response['id_token'])
-    );
+    const request = this.apiService.post<any>('users', user);
+    return request;
   }
 
   getToken(): string {
