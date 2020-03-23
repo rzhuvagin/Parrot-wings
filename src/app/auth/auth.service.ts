@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { tap, map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 import { UserLoginModel } from './login/user-login.model';
 import { UserRegistrationModel } from './registration/user-registration.model';
 import { AuthorizedUserModel } from './authorized-user.model';
-import { HttpClient } from '@angular/common/http';
 import { UserInfoModel } from './user-info.model';
-import { Router } from '@angular/router';
 
 interface AuthRequest {
   id_token: string;
