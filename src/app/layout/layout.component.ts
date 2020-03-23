@@ -21,6 +21,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this._subscriptions.push(this._authService.user$.subscribe(user => this.username = !!user ? user.username : null));
   }
 
+  onLogout() {
+    this._authService.logout();
+  }
+
   ngOnDestroy() {
     this._subscriptions.forEach(subscription => subscription.unsubscribe());
   }

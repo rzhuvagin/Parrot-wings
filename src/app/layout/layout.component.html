@@ -10,7 +10,7 @@
     <button *ngIf="!!username" mat-button [matMenuTriggerFor]="menu" class="nav__user">{{ username }} <mat-icon>person</mat-icon></button>
     <mat-menu #menu="matMenu">
       <button mat-menu-item>Settings</button>
-      <button mat-menu-item>Logout</button>
+      <button mat-menu-item (click)="onLogout()">Logout</button>
     </mat-menu>
   </div>
 </mat-toolbar>

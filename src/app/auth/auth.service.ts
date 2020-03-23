@@ -8,6 +8,7 @@ import { UserRegistrationModel } from './registration/user-registration.model';
 import { AuthorizedUserModel } from './authorized-user.model';
 import { HttpClient } from '@angular/common/http';
 import { UserInfoModel } from './user-info.model';
+import { Router } from '@angular/router';
 
 interface AuthRequest {
   id_token: string;
@@ -19,6 +20,7 @@ interface AuthRequest {
 export class AuthService {
   constructor(
     private _http: HttpClient,
+    private _router: Router,
     ) {}
 
   user$: BehaviorSubject<AuthorizedUserModel> = new BehaviorSubject(null);
@@ -45,6 +47,11 @@ export class AuthService {
       '/api/protected/user-info'
     );
     return request$.pipe(map(res => res.user_info_token));
+  }
+
+  logout() {
+    this.user$.next(null);
+    this._router.navigate(['/login']);
   }
 
   private handleUserAuthorize(token: string) {
