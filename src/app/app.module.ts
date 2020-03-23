@@ -5,11 +5,16 @@ import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistrationComponent } from './auth/registration/registration.component';
 import { LayoutComponent } from './layout/layout.component';
-import { AppRoutingModule } from './app-routing.module';
+import { TransactionsComponent } from './transactions/transactions.component';
+import { CreateTransactionComponent } from './transactions/create-transaction/create-transaction.component';
+import { AuthInterceptorService } from './auth/auth-interceptor.service';
+import { ApiInterceptorService } from './core/api-interceptor.service';
+import { TransactionsService } from './transactions/transactions.service';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,17 +23,18 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatCardModule } from '@angular/material/card';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import {MatSnackBarModule} from '@angular/material/snack-bar';
-import {MatDividerModule} from '@angular/material/divider';
-import { AuthInterceptorService } from './auth/auth-interceptor.service';
-import { ApiInterceptorService } from './core/api-interceptor.service';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
 
 @NgModule({
   declarations: [
     AppComponent,
     LayoutComponent,
     LoginComponent,
-    RegistrationComponent
+    RegistrationComponent,
+    TransactionsComponent,
+    CreateTransactionComponent
   ],
   imports: [
     BrowserModule,
@@ -47,7 +53,8 @@ import { ApiInterceptorService } from './core/api-interceptor.service';
     MatInputModule,
     MatFormFieldModule,
     MatSnackBarModule,
-    MatDividerModule
+    MatDividerModule,
+    MatAutocompleteModule,
   ],
   providers: [
     {

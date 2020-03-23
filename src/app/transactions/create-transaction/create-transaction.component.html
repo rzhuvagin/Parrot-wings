@@ -1,0 +1,61 @@
+<div class="card-wrapper">
+  <mat-card class="create-transaction">
+    <form [formGroup]="transactionForm" (ngSubmit)="submit()">
+      <mat-card-title>Send PW</mat-card-title>
+      <mat-card-subtitle>
+        Send some PWs to user
+      </mat-card-subtitle>
+
+      <div *ngIf="errorMessage" class="create-transaction__error">
+        <mat-divider></mat-divider>
+        <div class="create-transaction__error-label">
+          {{ errorMessage }}
+        </div>
+        <mat-divider></mat-divider>
+      </div>
+      <div class="create-transaction__fields-container">
+
+        <mat-form-field appearance="legacy">
+          <mat-label>Recipient's name</mat-label>
+          <input matInput type="text" formControlName="recipient" [matAutocomplete]="recipients">
+          <mat-autocomplete #recipients="matAutocomplete">
+            <mat-option *ngFor="let recipient of (filteredRecipients$ | async)" [value]="recipient">
+              {{ recipient }}
+            </mat-option>
+          </mat-autocomplete>
+          <mat-error
+            *ngIf="transactionForm.get('recipient').errors?.required"
+          >
+            Recipient is required
+          </mat-error>
+          <mat-error
+            *ngIf="transactionForm.get('recipient').errors?.userIsNotExist"
+          >
+            Recipient is not exist
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="legacy">
+          <mat-label>Amount</mat-label>
+          <input matInput type="number" formControlName="amount" />
+          <span matSuffix>PW</span>
+          <mat-error
+            *ngIf="transactionForm.get('amount').errors?.required"
+          >
+            Amount is required
+          </mat-error>
+        </mat-form-field>
+
+        <div class="create-transaction__button-container">
+          <button
+            mat-raised-button
+            color="primary"
+            [disabled]="!transactionForm.valid"
+          >
+            Send
+          </button>
+        </div>
+      </div>
+    </form>
+  </mat-card>
+</div>

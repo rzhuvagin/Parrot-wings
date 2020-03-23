@@ -19,18 +19,12 @@
           <mat-label>Enter your email</mat-label>
           <input matInput type="email" formControlName="email" />
           <mat-error
-            *ngIf="
-              !loginForm.get('email').valid &&
-              loginForm.get('email').errors['required']
-            "
+            *ngIf="loginForm.get('email').errors?.required"
           >
             Email is required
           </mat-error>
           <mat-error
-            *ngIf="
-              !loginForm.get('email').valid &&
-              loginForm.get('email').errors['email']
-            "
+            *ngIf="loginForm.get('email').errors?.email"
           >
             Email is not valid
           </mat-error>

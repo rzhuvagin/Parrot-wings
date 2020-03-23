@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { ApiService } from '../core/api.service';
 import { tap, map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -50,11 +49,11 @@ export class AuthService {
   }
 
   autoLogin() {
-    const loadedUser: AuthorizedUserModel = JSON.parse(sessionStorage.getItem('userData'));
-    if (!loadedUser) {
+    const userData = JSON.parse(sessionStorage.getItem('userData'));
+    if (!userData) {
       return;
     }
-    this.user$.next(loadedUser);
+    this.user$.next(new AuthorizedUserModel(userData.email, userData.username, userData._token));
   }
 
   logout() {
