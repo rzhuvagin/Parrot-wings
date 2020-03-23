@@ -13,12 +13,12 @@ export class LayoutComponent implements OnInit, OnDestroy {
     private _authService: AuthService,
   ) { }
 
-  private _subscriptions: Subscription[];
+  private _subscriptions: Subscription[] = [];
 
   username: string;
 
   ngOnInit() {
-    this._subscriptions.push(this._authService.user$.subscribe(user => !!user ? this.username = user.username : null));
+    this._subscriptions.push(this._authService.user$.subscribe(user => this.username = !!user ? user.username : null));
   }
 
   ngOnDestroy() {

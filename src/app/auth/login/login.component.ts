@@ -30,7 +30,6 @@ export class LoginComponent implements OnInit, OnDestroy{
         [Validators.required, Validators.email]
       ),
     });
-    this.loginForm.statusChanges.subscribe( status => console.log(this.loginForm))
   }
 
   ngOnDestroy() {

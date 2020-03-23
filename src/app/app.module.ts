@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -20,13 +20,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import {MatDividerModule} from '@angular/material/divider';
+import { AuthInterceptorService } from './auth/auth-interceptor.service';
+import { ApiInterceptorService } from './core/api-interceptor.service';
 
 @NgModule({
   declarations: [
     AppComponent,
     LayoutComponent,
     LoginComponent,
-    RegistrationComponent,
+    RegistrationComponent
   ],
   imports: [
     BrowserModule,
@@ -45,9 +47,20 @@ import {MatDividerModule} from '@angular/material/divider';
     MatInputModule,
     MatFormFieldModule,
     MatSnackBarModule,
-    MatDividerModule,
+    MatDividerModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ApiInterceptorService,
+      multi: true
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}

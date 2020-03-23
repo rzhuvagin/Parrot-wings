@@ -34,7 +34,6 @@ export class RegistrationComponent implements OnInit, OnDestroy{
         [Validators.required, Validators.email]
       ),
     });
-    this.registrationForm.statusChanges.subscribe( status => console.log(this.registrationForm))
   }
 
   ngOnDestroy() {

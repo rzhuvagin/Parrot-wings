@@ -1,47 +1,61 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from '../core/api.service';
-import { tap } from 'rxjs/operators';
-import { BehaviorSubject } from 'rxjs';
+import { tap, map } from 'rxjs/operators';
+import { BehaviorSubject, Observable } from 'rxjs';
 
-import { UserLoginModel } from './user-login.model';
-import { UserRegistrationModel } from './user-registration.model';
+import { UserLoginModel } from './login/user-login.model';
+import { UserRegistrationModel } from './registration/user-registration.model';
+import { AuthorizedUserModel } from './authorized-user.model';
+import { HttpClient } from '@angular/common/http';
+import { UserInfoModel } from './user-info.model';
 
-interface AuthorizedUser {
-  username: string;
-  email: string;
-  loggedAt: Date;
+interface AuthRequest {
+  id_token: string;
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuthService {
-  constructor(private _apiService: ApiService) { }
+  constructor(
+    private _http: HttpClient,
+    ) {}
 
-  user$: BehaviorSubject<AuthorizedUser> = new BehaviorSubject(null);
+  user$: BehaviorSubject<AuthorizedUserModel> = new BehaviorSubject(null);
 
   register$(user: UserRegistrationModel) {
-    const request$ = this._apiService.post$<any>('/users', user).pipe(
-      tap(res => {
-        this.user$.next({
-          username: user.username,
-          email: user.email,
-          loggedAt: new Date()
-        });
-        this.handleUserAuthorize(res['id_token']);
-      })
+    const request$ = this._http.post<AuthRequest>('/users', user)
+    .pipe(
+      tap(res => this.handleUserAuthorize(res.id_token))
     );
     return request$;
   }
 
   login$(user: UserLoginModel) {
-    const request$ = this._apiService.post$<any>('/sessions/create', user).pipe(
-      tap(res => this.handleUserAuthorize(res['id_token']))
-    );
+    const request$ = this._http
+      .post<AuthRequest>('/sessions/create', user)
+      .pipe(
+        tap(res => this.handleUserAuthorize(res.id_token))
+      );
     return request$;
   }
 
+  userInfo$(): Observable<UserInfoModel> {
+    const request$ = this._http.get<any>(
+      '/api/protected/user-info'
+    );
+    return request$.pipe(map(res => res.user_info_token));
+  }
+
   private handleUserAuthorize(token: string) {
-    localStorage.setItem('Authorization', 'Bearer ' + token);
+    this.user$.next(
+      new AuthorizedUserModel('', '', token)
+    );
+    const currentUser = this.user$.value;
+    this.userInfo$().subscribe(user => {
+      currentUser.username = user.name;
+      currentUser.email = user.email;
+      this.user$.next(currentUser);
+    });
   }
 }

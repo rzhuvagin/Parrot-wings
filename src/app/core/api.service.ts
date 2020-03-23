@@ -19,18 +19,10 @@ export class ApiService {
     body: object,
     showResult: boolean = false
   ) {
-    const headers = new HttpHeaders();
-    const token = localStorage.getItem('Authorization');
-    if (token) {
-      headers.append('authentication', `bearer ${token}`);
-    }
     const request$ = this._http.post<T>(
       environment.apiBaseUrl + url,
       body,
-      {
-        headers,
-      }
-    )
+    );
     if (!showResult) {
       return request$;
     }
