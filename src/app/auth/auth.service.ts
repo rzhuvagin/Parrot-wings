@@ -49,20 +49,28 @@ export class AuthService {
     return request$.pipe(map(res => res.user_info_token));
   }
 
+  autoLogin() {
+    const loadedUser: AuthorizedUserModel = JSON.parse(sessionStorage.getItem('userData'));
+    if (!loadedUser) {
+      return;
+    }
+    this.user$.next(loadedUser);
+  }
+
   logout() {
     this.user$.next(null);
+    sessionStorage.removeItem('userData');
     this._router.navigate(['/login']);
   }
 
   private handleUserAuthorize(token: string) {
-    this.user$.next(
-      new AuthorizedUserModel('', '', token)
-    );
-    const currentUser = this.user$.value;
+    const currentUser = new AuthorizedUserModel('', '', token);
+    this.user$.next(currentUser);
     this.userInfo$().subscribe(user => {
       currentUser.username = user.name;
       currentUser.email = user.email;
       this.user$.next(currentUser);
+      sessionStorage.setItem('userData', JSON.stringify(currentUser));
     });
   }
 }
