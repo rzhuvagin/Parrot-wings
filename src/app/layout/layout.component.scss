@@ -15,7 +15,15 @@
     text-decoration: none;
   }
 
-  &__user {
-    margin-left: auto;
+  &__btn {
+    line-height: normal;
+
+    &_send {
+
+    }
+
+    &_user {
+      margin-left: auto;
+    }
   }
 }

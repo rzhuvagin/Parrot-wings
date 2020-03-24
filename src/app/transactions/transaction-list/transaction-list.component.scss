@@ -1,0 +1,15 @@
+.transaction-list {
+  width: 800px;
+  height: 100%;
+  margin: 0 auto;
+  background-color: white;
+
+  &__table {
+    width: 100%;
+  }
+}
+
+.mat-row:hover {
+  background-color: #ae9fd8;
+  cursor: pointer;
+}

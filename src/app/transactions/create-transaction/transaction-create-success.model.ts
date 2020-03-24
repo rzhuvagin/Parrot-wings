@@ -1,9 +1,5 @@
+import { TransactionModel } from '../transaction.model';
+
 export class TransactionCreateSuccessModel {
-  trans_token: {
-    id: string,
-    date: string,
-    username: string,
-    amount: string,
-    balance: string
-  }
+  trans_token: TransactionModel;
 }

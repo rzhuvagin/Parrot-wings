@@ -12,9 +12,9 @@ import { RegistrationComponent } from './auth/registration/registration.componen
 import { LayoutComponent } from './layout/layout.component';
 import { TransactionsComponent } from './transactions/transactions.component';
 import { CreateTransactionComponent } from './transactions/create-transaction/create-transaction.component';
+import { TransactionListComponent } from './transactions/transaction-list/transaction-list.component';
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
 import { ApiInterceptorService } from './core/api-interceptor.service';
-import { TransactionsService } from './transactions/transactions.service';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -26,6 +26,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatTableModule } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     LoginComponent,
     RegistrationComponent,
     TransactionsComponent,
+    TransactionListComponent,
     CreateTransactionComponent
   ],
   imports: [
@@ -55,6 +58,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
     MatSnackBarModule,
     MatDividerModule,
     MatAutocompleteModule,
+    MatTableModule,
+    MatSortModule,
   ],
   providers: [
     {

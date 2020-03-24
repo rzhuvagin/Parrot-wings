@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { RecipientModel } from './recipient.model';
 import { TransactionCreateModel } from './create-transaction/transaction-create.model';
 import { TransactionCreateSuccessModel } from './create-transaction/transaction-create-success.model';
+import { TransactionListSuccessModel } from './transaction-list/transaction-list-success.model';
+import { map } from 'rxjs/operators';
 
 @Injectable({providedIn: 'root'})
 export class TransactionsService {
@@ -28,5 +30,12 @@ export class TransactionsService {
       }
     );
     return request$;
+  }
+
+  getTransactionList$() {
+    const request$ = this._http.get<TransactionListSuccessModel>(
+      '/api/protected/transactions',
+    );
+    return request$.pipe(map(res => res.trans_token));
   }
 }
