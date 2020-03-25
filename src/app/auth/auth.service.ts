@@ -3,6 +3,7 @@ import { tap, map } from 'rxjs/operators';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import * as jwt_decode from 'jwt-decode';
 
 import { UserLoginModel } from './login/user-login.model';
 import { UserRegistrationModel } from './registration/user-registration.model';
@@ -22,6 +23,7 @@ export class AuthService {
     private _router: Router,
     ) {}
 
+  private _logoutTimer: any;
   user$: BehaviorSubject<AuthorizedUserModel> = new BehaviorSubject(null);
 
   register$(user: UserRegistrationModel) {
@@ -50,15 +52,24 @@ export class AuthService {
 
   autoLogin() {
     const userData = JSON.parse(sessionStorage.getItem('userData'));
-    if (!userData) {
+    if (!userData || !this.getExpirationJWTTime(userData?._token)) {
       return;
     }
     this.user$.next(new AuthorizedUserModel(userData.email, userData.username, userData._token));
+    this.autoLogout();
+  }
+
+  autoLogout() {
+    this._logoutTimer = setTimeout(
+      () => this.logout(),
+      this.getExpirationJWTTime()
+    );
   }
 
   logout() {
     this.user$.next(null);
     sessionStorage.removeItem('userData');
+    clearTimeout(this._logoutTimer);
     this._router.navigate(['/login']);
   }
 
@@ -69,7 +80,21 @@ export class AuthService {
       currentUser.username = user.name;
       currentUser.email = user.email;
       this.user$.next(currentUser);
+      this.autoLogout();
       sessionStorage.setItem('userData', JSON.stringify(currentUser));
     });
+  }
+
+  public getExpirationJWTTime(token?: string): number {
+    if (!token) {
+      if (!!this.user$.value) {
+        token = this.user$.value.token;
+      } else {
+        return null;
+      }
+    }
+    const expDate = jwt_decode(token).exp;
+    const expTime = !!expDate ? expDate * 1000 - Date.now() : null;
+    return !!expTime && expTime > 0 ? expTime : null;
   }
 }

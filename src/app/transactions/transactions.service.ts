@@ -21,7 +21,7 @@ export class TransactionsService {
     return request$;
   }
 
-  createTransaction$(newTransaction: TransactionCreateModel){
+  createTransaction$(newTransaction: TransactionCreateModel) {
     const request$ = this._http.post<TransactionCreateSuccessModel>(
       '/api/protected/transactions',
       {

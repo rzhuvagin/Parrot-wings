@@ -6,13 +6,15 @@ import { exhaustMap, catchError, map, debounceTime, distinctUntilChanged, tap } 
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { TransactionsService } from '../transactions.service';
+import { BalanceService } from 'src/app/core/balance.service';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-create-transaction',
   templateUrl: './create-transaction.component.html',
   styleUrls: ['./create-transaction.component.scss']
 })
-export class CreateTransactionComponent implements OnInit, AfterViewInit, OnDestroy {
+export class CreateTransactionComponent implements OnInit, OnDestroy {
   private _recipientsValidationSuscription: Subscription;
   transactionForm: FormGroup;
   errorMessage: string;
@@ -22,18 +24,20 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit, OnDest
     private _route: ActivatedRoute,
     private _router: Router,
     private _transactionsService: TransactionsService,
+    private _authService: AuthService,
+    private _balanceService: BalanceService,
   ) { }
 
   ngOnInit() {
     this.transactionForm = new FormGroup({
       recipient: new FormControl(
         null,
-        [Validators.required],
-        // this.recipientExistingAsyncValidator()
+        [Validators.required, this.isItselfValidator.bind(this)],
+        this.recipientExistingAsyncValidator()
       ),
       amount: new FormControl(
         null,
-        [Validators.required, Validators.pattern(/[0-9]*/)]
+        [Validators.required, Validators.pattern(/[0-9]*/), Validators.max(this._balanceService.balance.value)]
       ),
     });
 
@@ -58,21 +62,19 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit, OnDest
 
     // Валидатор, который вручную ставит ошибку при начале изменений и убирает ошибку или меняет ее после ответа сервера
     // Позволяет существенно сократить кол-во обращений к серверу
-    this._recipientsValidationSuscription = this.transactionForm.controls.recipient.valueChanges.pipe(
-      tap(() => this.transactionForm.controls.recipient.setErrors({userIsNotExist: false})),
-      debounceTime(500),
-      distinctUntilChanged(),
-      exhaustMap(val => this._recipientIsExist$(val))
-    ).subscribe((isExist: boolean) => {
-      if (!isExist) {
-        this.transactionForm.controls.recipient.setErrors({userIsNotExist: true});
-      } else {
-        this.transactionForm.controls.recipient.setErrors(null);
-      }
-    });
-  }
+    // this._recipientsValidationSuscription = this.transactionForm.controls.recipient.valueChanges.pipe(
+    //   tap(() => this.transactionForm.controls.recipient.setErrors({userIsNotExist: false})),
+    //   debounceTime(500),
+    //   distinctUntilChanged(),
+    //   exhaustMap(val => this._recipientIsExist$(val))
+    // ).subscribe((isExist: boolean) => {
+    //   if (!isExist) {
+    //     this.transactionForm.controls.recipient.setErrors({userIsNotExist: true});
+    //   } else {
+    //     this.transactionForm.controls.recipient.setErrors(null);
+    //   }
+    // });
 
-  ngAfterViewInit() {
     this._route.params.subscribe((params: Params) => {
       this.transactionForm.controls.recipient.setValue(params?.recipient);
       this.transactionForm.controls.amount.setValue(params?.amount);
@@ -92,6 +94,10 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit, OnDest
       );
   }
 
+  isItselfValidator(control: AbstractControl) {
+    return control.value === this._authService.user$.value?.username ? {isItselfError: true} : null;
+  }
+
   submit() {
     if (this.transactionForm.invalid) {
       return;
@@ -99,12 +105,13 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit, OnDest
     this.errorMessage = '';
     this._transactionsService.createTransaction$(this.transactionForm.value).subscribe(
       res => {
+        this._balanceService.updateBalance(+res.trans_token.balance);
         this._router.navigate(['transactions']);
       },
       (error: HttpErrorResponse) => {
         this.errorMessage = error.error;
       }
-    )
+    );
   }
 
   ngOnDestroy() {

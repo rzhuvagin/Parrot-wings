@@ -33,6 +33,11 @@
           >
             Recipient is not exist
           </mat-error>
+          <mat-error
+            *ngIf="transactionForm.get('recipient').errors?.isItselfError"
+          >
+            You can't send PW to yourself
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="legacy">
