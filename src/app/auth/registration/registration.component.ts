@@ -10,7 +10,7 @@ import { AuthService } from '../auth.service';
   templateUrl: './registration.component.html',
   styleUrls: ['./registration.component.scss']
 })
-export class RegistrationComponent implements OnInit, OnDestroy{
+export class RegistrationComponent implements OnInit, OnDestroy {
   registrationForm: FormGroup;
   errorMessage: string;
   hidePassword = true;

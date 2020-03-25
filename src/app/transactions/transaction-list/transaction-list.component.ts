@@ -1,14 +1,10 @@
 import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
-import { FormGroup, FormControl, Validators, ValidationErrors, AbstractControl, AsyncValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Observable, Subscription, BehaviorSubject } from 'rxjs';
-import { exhaustMap, catchError, map, debounceTime, distinctUntilChanged, tap, take, switchMap } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Subscription } from 'rxjs';
+import { MatSort, Sort } from '@angular/material/sort';
 
 import { TransactionsService } from '../transactions.service';
 import { TransactionModel } from '../transaction.model';
-import { MatSort, Sort } from '@angular/material/sort';
-import { stringify } from 'querystring';
 
 @Component({
   selector: 'app-transaction-list',

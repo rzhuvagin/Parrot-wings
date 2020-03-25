@@ -49,6 +49,16 @@
           >
             Amount is required
           </mat-error>
+          <mat-error
+            *ngIf="transactionForm.get('amount').errors?.zeroAmount"
+          >
+            Amount must be greater 0
+          </mat-error>
+          <mat-error
+            *ngIf="transactionForm.get('amount').errors?.amountIsBiggerBalance"
+          >
+            Amount is bigger then your balance
+          </mat-error>
         </mat-form-field>
 
         <div class="create-transaction__button-container">
