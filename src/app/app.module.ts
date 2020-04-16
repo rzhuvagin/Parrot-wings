@@ -5,7 +5,14 @@ import { BrowserModule } from '@angular/platform-browser';
 import { ReactiveFormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
+import { TransactionsEffects } from './core/store/effects/transactions.effects';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+
 import { AppRoutingModule } from './app-routing.module';
+import { appReducers } from './core/store/reducers/app.reducers';
 import { AppComponent } from './app.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegistrationComponent } from './auth/registration/registration.component';
@@ -15,6 +22,7 @@ import { CreateTransactionComponent } from './transactions/create-transaction/cr
 import { TransactionListComponent } from './transactions/transaction-list/transaction-list.component';
 import { AuthInterceptorService } from './auth/auth-interceptor.service';
 import { ApiInterceptorService } from './core/api-interceptor.service';
+import { environment } from 'src/environments/environment';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -47,6 +55,13 @@ import { MatSortModule } from '@angular/material/sort';
     BrowserAnimationsModule,
 
     AppRoutingModule,
+
+    StoreModule.forRoot(appReducers),
+    EffectsModule.forRoot([
+      TransactionsEffects,
+    ]),
+    StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
+    !environment.production ? StoreDevtoolsModule.instrument() : [],
 
     MatToolbarModule,
     MatButtonModule,
