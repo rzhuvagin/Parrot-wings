@@ -1,9 +1,11 @@
 import { TransactionModel } from 'src/app/transactions/transaction.model';
 
 export interface ITransactionsState {
-  transactions: TransactionModel[];
+  transactionList: TransactionModel[];
+  creatingError: string;
 }
 
 export const initialTransactionsState: ITransactionsState = {
-  transactions: []
+  transactionList: [],
+  creatingError: '',
 };

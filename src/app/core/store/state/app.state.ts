@@ -8,7 +8,7 @@ export interface IAppState {
 
 export const initialAppState: IAppState = {
   transactions: initialTransactionsState,
-}
+};
 
 export function getInitialState(): IAppState {
   return initialAppState;

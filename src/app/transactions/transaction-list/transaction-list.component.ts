@@ -5,6 +5,10 @@ import { MatSort, Sort } from '@angular/material/sort';
 
 import { TransactionsService } from '../transactions.service';
 import { TransactionModel } from '../transaction.model';
+import { IAppState } from 'src/app/core/store/state/app.state';
+import { Store, select } from '@ngrx/store';
+import { selectTransactionList } from 'src/app/core/store/selectors/transactions.selector';
+import { GetTransactionsRequest } from 'src/app/core/store/actions/transactions.actions';
 
 @Component({
   selector: 'app-transaction-list',
@@ -15,18 +19,18 @@ export class TransactionListComponent implements OnInit, AfterViewInit, OnDestro
   @ViewChild(MatSort) sort: MatSort;
 
   private _transactionListSuscription: Subscription;
-  dataSource: TransactionModel[]; // Observable<TransactionModel[]>;
+  transactions$ = this._store.pipe(select(selectTransactionList)).subscribe(trList => this.dataSource = trList);
+  dataSource: TransactionModel[];
   displayedColumns = ['id', 'date', 'username', 'amount', 'balance'];
 
   constructor(
     private _router: Router,
+    private _store: Store<IAppState>,
     private _transactionsService: TransactionsService,
   ) { }
 
   ngOnInit() {
-    this._transactionsService
-      .getTransactionList$()
-      .subscribe(list => this.dataSource = list);
+    this._store.dispatch(new GetTransactionsRequest());
   }
 
   ngAfterViewInit() {

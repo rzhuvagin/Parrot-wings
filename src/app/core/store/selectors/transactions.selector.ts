@@ -1,4 +1,4 @@
-import { IAppState } from "../state/app.state";
+import { IAppState } from '../state/app.state';
 import { createSelector } from '@ngrx/store';
 import { ITransactionsState } from '../state/transactions.state';
 
@@ -6,5 +6,10 @@ const selectTransactions = (state: IAppState) => state.transactions;
 
 export const selectTransactionList = createSelector(
   selectTransactions,
-  (state: ITransactionsState) => state.transactions
+  (state: ITransactionsState) => state.transactionList
+);
+
+export const selectTransactionCreatingError = createSelector(
+  selectTransactions,
+  (state: ITransactionsState) => state.creatingError
 );

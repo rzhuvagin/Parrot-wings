@@ -8,6 +8,11 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { TransactionsService } from '../transactions.service';
 import { BalanceService } from 'src/app/core/balance.service';
 import { AuthService } from 'src/app/auth/auth.service';
+import { IAppState } from 'src/app/core/store/state/app.state';
+import { Store, select } from '@ngrx/store';
+import { CreateTransactionRequest, ClearTransactionsCreatingError } from 'src/app/core/store/actions/transactions.actions';
+import { TransactionCreateModel } from './transaction-create.model';
+import { selectTransactionCreatingError } from 'src/app/core/store/selectors/transactions.selector';
 
 @Component({
   selector: 'app-create-transaction',
@@ -16,7 +21,7 @@ import { AuthService } from 'src/app/auth/auth.service';
 })
 export class CreateTransactionComponent implements OnInit, AfterViewInit {
   transactionForm: FormGroup;
-  errorMessage: string;
+  errorMessage = this._store.pipe(select(selectTransactionCreatingError));
   filteredRecipients$: Observable<string>;
 
   constructor(
@@ -25,6 +30,7 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit {
     private _transactionsService: TransactionsService,
     private _authService: AuthService,
     private _balanceService: BalanceService,
+    private _store: Store<IAppState>,
   ) { }
 
   ngOnInit() {
@@ -123,15 +129,11 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit {
     if (this.transactionForm.invalid) {
       return;
     }
-    this.errorMessage = '';
-    this._transactionsService.createTransaction$(this.transactionForm.value).subscribe(
-      res => {
-        this._balanceService.updateBalance(+res.trans_token.balance);
-        this._router.navigate(['transactions']);
-      },
-      (error: HttpErrorResponse) => {
-        this.errorMessage = error.error;
-      }
-    );
+    this._store.dispatch(new ClearTransactionsCreatingError());
+
+    this._store.dispatch(new CreateTransactionRequest({
+      recipient: this.transactionForm.value.recipient,
+      amount: this.transactionForm.value.amount
+    }));
   }
 }

@@ -4,12 +4,22 @@ import { TransactionsActions, ETransactionsActions } from '../actions/transactio
 export const transactionsReducers = (
   state = initialTransactionsState,
   action: TransactionsActions
-): ITransactionsState {
+): ITransactionsState => {
   switch (action.type) {
     case ETransactionsActions.GetTransactionsSuccess:
       return {
         ...state,
-        transactions: action.payload
+        transactionList: action.payload
+      };
+    case ETransactionsActions.CreateTransactionFail:
+      return {
+        ...state,
+        creatingError: action.payload.error
+      };
+    case ETransactionsActions.ClearTransactionsCreatingError:
+      return {
+        ...state,
+        creatingError: ''
       };
     default:
       return state;
