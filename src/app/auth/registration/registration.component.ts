@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { HttpErrorResponse } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 
-import { AuthService } from '../auth.service';
+import { IAppState } from 'src/app/core/store/state/app.state';
+import { RegisterUserRequest, ClearAuthError } from 'src/app/core/store/actions/user.actions';
 
 @Component({
   selector: 'app-registration',
@@ -16,8 +16,7 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   hidePassword = true;
 
   constructor(
-    private _authService: AuthService,
-    private _router: Router,
+    private _store: Store<IAppState>,
   ) { }
 
   ngOnInit() {
@@ -42,15 +41,8 @@ export class RegistrationComponent implements OnInit, OnDestroy {
   }
 
   submit() {
-    this.errorMessage = '';
+    this._store.dispatch(new ClearAuthError());
     const user = this.registrationForm.value;
-    this._authService.register$(user).subscribe(
-      response => {
-        this._router.navigate(['/']);
-      },
-      (error: HttpErrorResponse) => {
-        this.errorMessage = error.error;
-      }
-    );
+    this._store.dispatch(new RegisterUserRequest(user));
   }
 }

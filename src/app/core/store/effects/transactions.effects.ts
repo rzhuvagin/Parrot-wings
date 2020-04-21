@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { IAppState } from '../state/app.state';
-import { GetTransactionsRequest, ETransactionsActions, GetTransactionsSuccess, CreateTransactionRequest, CreateTransactionSuccess, CreateTransactionFail } from '../actions/transactions.actions';
-import { TransactionsService } from 'src/app/transactions/transactions.service';
-import { switchMap, catchError } from 'rxjs/operators';
-import { TransactionModel } from 'src/app/transactions/transaction.model';
+import { switchMap, catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
+
+import { TransactionsService } from 'src/app/transactions/transactions.service';
+import { TransactionModel } from 'src/app/transactions/transaction.model';
+import { UpdateUserBalance } from '../actions/user.actions';
+import { GetTransactionsRequest, ETransactionsActions, GetTransactionsSuccess, CreateTransactionRequest, CreateTransactionSuccess, CreateTransactionFail } from '../actions/transactions.actions';
 
 @Injectable()
 export class TransactionsEffects {
@@ -24,15 +25,27 @@ export class TransactionsEffects {
   createTransaction$ = this._actions$.pipe(
     ofType<CreateTransactionRequest>(ETransactionsActions.CreateTransactionRequest),
     switchMap((createTransactionAction) => this._transactionsService.createTransaction$(createTransactionAction.payload)),
-    switchMap(() => {
-      return of(new CreateTransactionSuccess());
+    switchMap((trx) => {
+      return of(new CreateTransactionSuccess(trx.trans_token));
+    }),
+    catchError((error: HttpErrorResponse) => of(new CreateTransactionFail(error)))
+  );
+
+  @Effect()
+  createTransactionSuccess$ = this._actions$.pipe(
+    ofType<CreateTransactionSuccess>(ETransactionsActions.CreateTransactionSuccess),
+    switchMap((createTransactionSuccessAction) => {
+      return of(new UpdateUserBalance(+createTransactionSuccessAction.payload.balance));
+    }),
+    tap(() => {
+      this._router.navigate(['/']);
     }),
     catchError((error: HttpErrorResponse) => of(new CreateTransactionFail(error)))
   );
 
   constructor(
     private _actions$: Actions,
-    private _store$: Store<IAppState>,
+    private _router: Router,
     private _transactionsService: TransactionsService,
   ) {}
 }

@@ -1,14 +1,18 @@
 import { Injectable } from '@angular/core';
-import { tap, map } from 'rxjs/operators';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { tap, map, take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Store, select } from '@ngrx/store';
 import * as jwt_decode from 'jwt-decode';
 
 import { UserLoginModel } from './login/user-login.model';
 import { UserRegistrationModel } from './registration/user-registration.model';
 import { AuthorizedUserModel } from './authorized-user.model';
 import { UserInfoModel } from './user-info.model';
+import { IAppState } from '../core/store/state/app.state';
+import { UpdateUserData, UpdateUserBalance } from '../core/store/actions/user.actions';
+import { selectUserToken } from '../core/store/selectors/user.selector';
 
 interface AuthRequest {
   id_token: string;
@@ -21,10 +25,10 @@ export class AuthService {
   constructor(
     private _http: HttpClient,
     private _router: Router,
+    private _store: Store<IAppState>,
     ) {}
 
   private _logoutTimer: any;
-  user$: BehaviorSubject<AuthorizedUserModel> = new BehaviorSubject(null);
 
   register$(user: UserRegistrationModel) {
     const request$ = this._http.post<AuthRequest>('/users', user)
@@ -50,48 +54,50 @@ export class AuthService {
     return request$.pipe(map(res => res.user_info_token));
   }
 
-  autoLogin() {
+  async autoLogin() {
     const userData = JSON.parse(sessionStorage.getItem('userData'));
-    if (!userData || !this.getExpirationJWTTime(userData?._token)) {
+    if (!userData || !(await this.getExpirationJWTTime(userData?.token))) {
       return;
     }
-    this.user$.next(new AuthorizedUserModel(userData.email, userData.username, userData._token));
+    this._store.dispatch(new UpdateUserData(new AuthorizedUserModel(userData.email, userData.username, userData.token)));
+    this.userInfo$().subscribe(user => {
+      this._store.dispatch(new UpdateUserBalance(user.balance));
+    });
     this.autoLogout();
   }
 
-  autoLogout() {
+  async autoLogout() {
     this._logoutTimer = setTimeout(
       () => this.logout(),
-      this.getExpirationJWTTime()
+      await this.getExpirationJWTTime()
     );
   }
 
   logout() {
-    this.user$.next(null);
+    this._store.dispatch(new UpdateUserData(null));
     sessionStorage.removeItem('userData');
     clearTimeout(this._logoutTimer);
     this._router.navigate(['/login']);
   }
 
   private handleUserAuthorize(token: string) {
-    const currentUser = new AuthorizedUserModel('', '', token);
-    this.user$.next(currentUser);
+    let currentUser = new AuthorizedUserModel('', '', token);
+    this._store.dispatch(new UpdateUserData(currentUser));
     this.userInfo$().subscribe(user => {
-      currentUser.username = user.name;
-      currentUser.email = user.email;
-      this.user$.next(currentUser);
+      currentUser = new AuthorizedUserModel(user.email, user.name, token);
+      this._store.dispatch(new UpdateUserData(currentUser));
+      this._store.dispatch(new UpdateUserBalance(user.balance));
       this.autoLogout();
       sessionStorage.setItem('userData', JSON.stringify(currentUser));
     });
   }
 
-  public getExpirationJWTTime(token?: string): number {
+  public async getExpirationJWTTime(token?: string): Promise<number> {
     if (!token) {
-      if (!!this.user$.value) {
-        token = this.user$.value.token;
-      } else {
-        return null;
-      }
+      token = await this._store.pipe(
+        select(selectUserToken),
+        take(1)
+      ).toPromise();
     }
     const expDate = jwt_decode(token).exp;
     const expTime = !!expDate ? expDate * 1000 - Date.now() : null;

@@ -1,9 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable } from 'rxjs';
 import { Router } from '@angular/router';
+import { Store, select } from '@ngrx/store';
+import { map } from 'rxjs/operators';
 
 import { AuthService } from '../auth/auth.service';
-import { BalanceService } from '../core/balance.service';
+import { IAppState } from '../core/store/state/app.state';
+import { selectUserBalance, selectUserData } from '../core/store/selectors/user.selector';
 
 @Component({
   selector: 'app-layout',
@@ -14,17 +17,17 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   constructor(
     private _authService: AuthService,
-    private _balanceService: BalanceService,
     private _router: Router,
+    private _store: Store<IAppState>,
   ) { }
 
   private _userSbscriptions: Subscription;
 
-  balance = this._balanceService.balance;
-  username: string;
+  balance =  this._store.pipe(select(selectUserBalance));
+  username: Observable<string>;
 
   ngOnInit() {
-    this._userSbscriptions = this._authService.user$.subscribe(user => this.username = !!user ? user.username : null);
+    this.username = this._store.pipe(select(selectUserData), map(userData => !!userData ? userData.username : null));
   }
 
   onToSending() {

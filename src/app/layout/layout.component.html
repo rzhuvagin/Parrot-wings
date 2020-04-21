@@ -7,12 +7,12 @@
       </div>
       <h1 class="example-app-name">Parrot wings</h1>
     </a>
-    <button *ngIf="!!username" mat-button class="nav__btn nav__btn_send" (click)=onToSending()>Send PW</button>
-    <button *ngIf="!!username" mat-button class="nav__btn nav__btn_transactions" (click)=onToTransactions()>Transactions</button>
-    <button *ngIf="!!username" mat-button [matMenuTriggerFor]="menu" class="nav__btn nav__btn_user">
+    <button *ngIf="!!(username | async)" mat-button class="nav__btn nav__btn_send" (click)=onToSending()>Send PW</button>
+    <button *ngIf="!!(username | async)" mat-button class="nav__btn nav__btn_transactions" (click)=onToTransactions()>Transactions</button>
+    <button *ngIf="!!(username | async)" mat-button [matMenuTriggerFor]="menu" class="nav__btn nav__btn_user">
       <div class="nav__btn_content">
         <span class="user-info">
-          <span class="user-info__name">{{ username }}</span>
+          <span class="user-info__name">{{ username | async }}</span>
           <span class="user-info__balance">{{ balance | async }} PW</span>
         </span>
         <mat-icon>person</mat-icon>

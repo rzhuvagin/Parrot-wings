@@ -19,7 +19,7 @@ export const transactionsReducers = (
     case ETransactionsActions.ClearTransactionsCreatingError:
       return {
         ...state,
-        creatingError: ''
+        creatingError: initialTransactionsState.creatingError
       };
     default:
       return state;

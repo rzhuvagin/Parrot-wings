@@ -1,7 +1,8 @@
 import { Action } from '@ngrx/store';
+import { HttpErrorResponse } from '@angular/common/http';
+
 import { TransactionModel } from 'src/app/transactions/transaction.model';
 import { TransactionCreateModel } from 'src/app/transactions/create-transaction/transaction-create.model';
-import { HttpErrorResponse } from '@angular/common/http';
 
 export enum ETransactionsActions {
   GetTransactionsRequest = 'TRANSACTIONS/GetTransactions_Request',
@@ -35,6 +36,7 @@ export class CreateTransactionRequest implements Action {
 
 export class CreateTransactionSuccess implements Action {
   public readonly type = ETransactionsActions.CreateTransactionSuccess;
+  constructor(public payload: TransactionModel) {}
 }
 
 export class CreateTransactionFail implements Action {

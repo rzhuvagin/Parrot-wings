@@ -6,10 +6,10 @@
         Send some PWs to user
       </mat-card-subtitle>
 
-      <div *ngIf="errorMessage | async" class="create-transaction__error">
+      <div *ngIf="errorMessage$ | async" class="create-transaction__error">
         <mat-divider></mat-divider>
         <div class="create-transaction__error-label">
-          {{ errorMessage | async }}
+          {{ errorMessage$ | async }}
         </div>
         <mat-divider></mat-divider>
       </div>

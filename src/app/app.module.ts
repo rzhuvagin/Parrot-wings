@@ -36,6 +36,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule } from '@angular/material/sort';
+import { UserEffects } from './core/store/effects/user.effects';
 
 @NgModule({
   declarations: [
@@ -59,6 +60,7 @@ import { MatSortModule } from '@angular/material/sort';
     StoreModule.forRoot(appReducers),
     EffectsModule.forRoot([
       TransactionsEffects,
+      UserEffects,
     ]),
     StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
     !environment.production ? StoreDevtoolsModule.instrument() : [],

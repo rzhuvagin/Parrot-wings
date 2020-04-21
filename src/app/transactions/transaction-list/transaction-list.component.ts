@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { MatSort, Sort } from '@angular/material/sort';
+import { Store, select } from '@ngrx/store';
 
 import { TransactionsService } from '../transactions.service';
 import { TransactionModel } from '../transaction.model';
 import { IAppState } from 'src/app/core/store/state/app.state';
-import { Store, select } from '@ngrx/store';
 import { selectTransactionList } from 'src/app/core/store/selectors/transactions.selector';
 import { GetTransactionsRequest } from 'src/app/core/store/actions/transactions.actions';
 

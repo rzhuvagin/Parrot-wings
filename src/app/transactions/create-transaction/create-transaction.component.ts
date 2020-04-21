@@ -1,18 +1,15 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormGroup, FormControl, Validators, ValidationErrors, AbstractControl, AsyncValidatorFn } from '@angular/forms';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { Observable, race, timer } from 'rxjs';
 import { exhaustMap, catchError, map, debounceTime, distinctUntilChanged, delay, take } from 'rxjs/operators';
-import { HttpErrorResponse } from '@angular/common/http';
+import { Store, select } from '@ngrx/store';
 
 import { TransactionsService } from '../transactions.service';
-import { BalanceService } from 'src/app/core/balance.service';
-import { AuthService } from 'src/app/auth/auth.service';
 import { IAppState } from 'src/app/core/store/state/app.state';
-import { Store, select } from '@ngrx/store';
 import { CreateTransactionRequest, ClearTransactionsCreatingError } from 'src/app/core/store/actions/transactions.actions';
-import { TransactionCreateModel } from './transaction-create.model';
 import { selectTransactionCreatingError } from 'src/app/core/store/selectors/transactions.selector';
+import { selectUserBalance, selectUserData } from 'src/app/core/store/selectors/user.selector';
 
 @Component({
   selector: 'app-create-transaction',
@@ -21,15 +18,14 @@ import { selectTransactionCreatingError } from 'src/app/core/store/selectors/tra
 })
 export class CreateTransactionComponent implements OnInit, AfterViewInit {
   transactionForm: FormGroup;
-  errorMessage = this._store.pipe(select(selectTransactionCreatingError));
+  errorMessage$ = this._store.pipe(select(selectTransactionCreatingError));
+  balance$ = this._store.pipe(select(selectUserBalance));
+  userData$ = this._store.pipe(select(selectUserData));
   filteredRecipients$: Observable<string>;
 
   constructor(
     private _route: ActivatedRoute,
-    private _router: Router,
     private _transactionsService: TransactionsService,
-    private _authService: AuthService,
-    private _balanceService: BalanceService,
     private _store: Store<IAppState>,
   ) { }
 
@@ -37,12 +33,13 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit {
     this.transactionForm = new FormGroup({
       recipient: new FormControl(
         null,
-        [Validators.required, this.isItselfValidator.bind(this)],
-        this.recipientExistingAsyncValidator()
+        [Validators.required],
+        [this.recipientExistingAsyncValidator(), this.isItselfAsyncValidator()]
       ),
       amount: new FormControl(
         null,
-        [Validators.required, this.greaterZeroValidator.bind(this), this.maxAmountValidator.bind(this)]
+        [Validators.required, this.greaterZeroValidator.bind(this)],
+        this.maxAmountAsyncValidator()
       ),
     });
 
@@ -60,12 +57,10 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit {
               )
           ),
           // Подпорка для сломанного эндпоинта, который возвращает 401
-          catchError(error => [])
+          catchError(() => [])
         )
       )
     );
-
-
   }
 
   ngAfterViewInit() {
@@ -106,15 +101,23 @@ export class CreateTransactionComponent implements OnInit, AfterViewInit {
   /**
    * Проверяет, что пользователь не пытается отправить PW себе
    */
-  isItselfValidator(control: AbstractControl) {
-    return control.value === this._authService.user$.value?.username ? {isItselfError: true} : null;
+  isItselfAsyncValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> =>
+      this.userData$.pipe(
+        take(1),
+        map(user => control.value === user?.username ? {isItselfError: true} : null)
+      )
   }
 
   /**
    * Проверяет, что сумма не больше баланса
    */
-  maxAmountValidator(control: AbstractControl) {
-    return +control.value > this._balanceService.balance.value ? {amountIsBiggerBalance: true} : null;
+  maxAmountAsyncValidator(): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> =>
+      this.balance$.pipe(
+        take(1),
+        map(balance => +control.value > balance ? {amountIsBiggerBalance: true} : null)
+      );
   }
 
   /**
